@@ -160,10 +160,17 @@
             pulseScale 2s ease-in-out 1s infinite;
         }
 
-        @keyframes shine{
-        0%{ left:-100%;}
-        100%{ left:200%;}
+        @keyframes softFade {
+        0%, 100% {
+            opacity: 1;
         }
+        50% {
+            opacity: 0.6;
+        }
+        }
+
+
+
 
         .link-btn{
           display:inline-block;
@@ -174,7 +181,9 @@
           text-decoration:none;
           border-radius:10px;
           transition:0.3s;
-          animation: pulseScale 2s ease-in-out infinite;
+          /* animation: pulseScale 2s ease-in-out infinite; */
+          /* animation: floatY 3s ease-in-out infinite; */
+          animation: softFade 2s ease-in-out infinite;
         }
         .link-btn:hover{
           opacity:1;
@@ -226,7 +235,7 @@
                 <a href="#our-story" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">OUR STORY</a>
                 <a href="#seating-guide" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">GUEST</a>
                 <a href="#cuisine" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">CUISINE</a>
-                <a href="#special-memories" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">SPECIAL MEMORY</a>
+                <a href="#special-memories" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">SPECIALS</a>
             </nav>
             <div class="mt-10 pt-6 border-t border-wedding-border/30 text-xs tracking-[0.2em] text-wedding-text/50">
                 2026.9.12
@@ -274,9 +283,15 @@
                     <div class="absolute -bottom-6 -right-6 w-32 h-32 border border-wedding-border z-[-1] transition-transform duration-500 group-hover:translate-x-2 group-hover:translate-y-2"></div>
                 </div>
                 <div class="w-full md:w-1/2 text-sm leading-loose tracking-wider space-y-6 fade-up font-light">
-                    <p>皆様におかれましては<br>お健やかにお過ごしのこととお慶び申し上げます</p>
-                    <p>この度 私たちは結婚式を挙げることとなりました<br>今日という日を迎えられたのも<br>皆様の温かい支えがあったからこそと<br>心より感謝申し上げます</p>
-                    <p>ささやかではございますが<br>感謝の気持ちを込めて 小宴をご用意いたしました<br>皆様と楽しく 穏やかなひとときを<br>過ごせますと幸いです</p>
+                
+                <p>本日は、私たちのためにご遠方からお越しいただき、<br>本当にありがとうございます。</p>
+                <p>北は東北、南は九州まで、<br>それぞれの場所で日々を過ごされている皆様が、<br>こうして同じ時間に集まってくださったこと</p>
+                <p>ただ嬉しいという言葉だけでは足りない気がしています。</p>
+                <p>学生時代からの旧友<br>仕事や人生を共に乗り越えてきた戦友<br>日頃よりお世話になっております先輩</p>
+                <p>お集まり頂いた顔ぶれを見ていると、これまでの時間や思い出が、<br>少しずつ重なって今につながっていることを改めて感じます。</p>
+                <p>ふとした瞬間に、それぞれの頃の記憶を思い出しながら、<br>今日という時間を過ごしていただけたら嬉しいです。</p>
+                <p>そして、この一日が、<br>皆さまにとっても心地よいひとときになりますように。</p>
+                    
                 </div>
             </div>
         </section>
@@ -347,11 +362,19 @@
 
                 <span class="text-xs tracking-widest text-wedding-accent">ふたりの歩み</span>
                 <p class="text-xs mt-6 text-wedding-text/70">
+                    
                     私たちは出会ってから今まで、<br>
-                    それぞれの場所でそれぞれの人生を自由に歩んできました。<br><br>
+                    それぞれの場所で日々を重ねながら、<br>
+                    少しずつ同じ未来に向かって歩んできました。<br>
+                    <br>
                     遠く離れて過ごす時間もありましたが、<br>
                     その距離があったからこそお互いの大切さを知り、<br>
-                    ふたりの絆はより深まったように思います。
+                    ふたりの絆はより深まったように思います。<br>
+                    <br>
+                    こうしてあらためて自分たちの歩みをご紹介するのは、<br>
+                    どこか照れくさく、少し大げさな気もしていますが、<br>
+                    少しだけお付き合いいただけたら嬉しいです。
+
                 </p>
             </div>
 
@@ -391,18 +414,15 @@
             </div>
             <div class="text-center mb-12 fade-up">
                 <p class="text-xs mt-12 text-wedding-text/70">
-                    それぞれの街で育ち、それぞれの時間を過ごしてきた私たち<br>
-                    家族や友人に囲まれながら、たくさんの思い出を重ねてきました<br>
+                    私たちのこれまでの歩みを<br>
+                    もう少し詳しく紹介しています<br>
                     <br>
-                    学生時代の何気ない日々、社会に出てからの新しい出会い、<br>
-                    その一つひとつの経験が、今の私たちへとつながっています<br>
+                    下のボタンから、お気軽に覗いてみてください。
                     <br>
-                    ここでは、そんな二人のルーツと出会いから今日までの思い出を、<br>
-                    少しだけご紹介したいと思います
-                    </p>
+                </p>
 
                 <div class="container">
-                    <a href="gallery.html" class="link-btn mt-5 tracking-[0.5em] ">ABOUT US</a>
+                    <a href="gallery.html" class="link-btn mt-5 tracking-[0.5em] ">A LITTLE MORE ABOUT US</a>
                 </div>
             </div>
 
@@ -419,18 +439,15 @@
                 </div>
                 <div class="text-center mb-12 fade-up">
                     <p class="text-xs mt-6 text-wedding-text/70">
-
-                        北は北海道、南は九州まで、<br>
-                        ご遠方から私たちのために<br>
-                        集まってくれた大切な人たち。<br>
+                        席次表と本日のキーマンをご紹介します。<br>
                         <br>
-                        学生時代からの友人や、<br>
-                        社会人になって出会った仲間たち。<br>
-                        それぞれの時間の中で、<br>
-                        たくさんの思い出を重ねてきました。<br>
+                        そして<br>
                         <br>
-                        私たちの人生を彩ってくれた、<br>
-                        そんな大切な仲間たちをご紹介します。
+                        お越し頂いた皆様との思い出を<br>
+                        振り返るギャラリーをご用意しました。<br>
+                        <br>
+                        懐かしい瞬間と空気感を<br>
+                        お食事やお酒とともに、感じていただけたら嬉しいです。
                     <p>
 
                 </div>
@@ -522,15 +539,22 @@
                 <h2 class="font-lato text-4xl mb-2 font-light tracking-[0.25em]">CUISINE</h2>
                 <span class="text-xs tracking-widest text-wedding-accent">おもてなしの料理</span>
                 <p class="text-xs mt-6 text-wedding-text/70">
-                    皆さまのために、<br>
-                    素敵なお料理をご用意しました。<br>
+
+                    会場の雰囲気に合わせて、<br>
+                    「緑」をテーマに素敵な料理をご用意しております<br>
                     <br>
-                    会場の雰囲気に合わせ、<br>
-                    緑を基調とした彩り豊かな一皿一皿となっています。<br>
-                    目でも楽しめる、特別なコースです。<br>
+                    見た目の彩りはもちろん、<br>
+                    季節や食材の表情も感じていただけたら嬉しいです。<br>
                     <br>
-                    念のため、新郎の友人にもわかるように、<br>
-                    料理の見どころを少しだけご紹介します。
+                    教養に不安のある新郎友人にも伝わるように、<br>
+                    ほんの少しだけ説明を添えさせていただきます。<br>
+                    <br>
+                    気軽に、そして自由に。<br>
+                    <br>
+                    それぞれのペースで、<br>
+                    この時間とお料理を味わっていただけますように。
+
+
                 </p>
             </div>
 
@@ -545,39 +569,39 @@
 
             <div class="max-w-md mx-auto text-center relative z-10">
                 <div class="mb-12 fade-up">
-                    <h2 class="font-lato text-4xl mb-2 font-light tracking-[0.1em]">SPECIAL MEMORY</h2>
+                    <h2 class="font-lato text-4xl mb-2 font-light tracking-[0.25em]">SPECIALS</h2>
                     <span class="text-xs tracking-widest text-wedding-accent">あなたへの特別なメッセージ</span>
                     <p class="text-xs mt-6 text-wedding-text/70">
-                        ほんのひととき、<br>
-                        私たちとの時間を振り返ってみてください。<br>
+                        
+                        あなただけに、<br>
+                        思い出の写真とともに<br>
+                        あなた宛のメッセージを用意しています。<br>
                         <br>
-                        幼い頃からそばで見守ってくれたあなた。<br>
-                        青春を一緒に駆け抜けたあなた。<br>
-                        グラスを片手に、夜の街を歩いたあなた。<br>
-                        <br>
-                        そのひとつひとつの記憶を、<br>
-                        小さなアーカイブとして残しました。<br>
-                        <br>
-                        お手元のテーブルに置かれたコードをご覧ください。<br>
-                        その日付は、私たちとあなたをつなぐ合言葉です。<br>
-                        <br>
-                        数字を入力すれば、<br>
-                        あの日の記憶が静かに開きます。
 
+                        幼い頃からそばで見守ってくれたあなた<br>
+                        青春を一緒に駆け抜けたあなた<br>
+                        グラスを片手に、夜の街を歩いたあなた<br>
+                        <br><br>
+                        お手元にある日付が、<br>
+                        あなたとの思い出を開く”コード”になっています。<br>
+                        <br><br>
+                        どんな記憶につながるのか、<br>
+                        少しだけ想像しながら開いてみてください。
+                        
                     </p>
                 </div>
 
                 <!-- 認証フォーム -->
                 <div id="auth-section" class="fade-up bg-black/5 p-8 rounded-2xl backdrop-blur-sm border border-wedding-accent/50 relative z-20">
                     <p class="text-sm mb-6 leading-relaxed font-light">
-                        招待状に同封された<br>
+                        エスコートカードに記載の<br>
                         8桁のコードを入力してください
                     </p>
                     <div class="flex justify-center gap-2 mb-6 ">
                         <input type="tel" id="passcode" maxlength="8" placeholder="00000000" inputmode="numeric" pattern="[0-9]*" class="w-40 bg-transparent border-b border-wedding-accent text-center text-lg font-light tracking-[0.2em] py-2 focus:outline-none focus:border-wedding-accent transition-colors placeholder:text-wedding-accent/20 font-lato relative z-30">
                     </div>
                     <button id="unlock-btn" class="bg-wedding-accent text-wedding-text px-10 py-3 rounded-full text-sm font-lato tracking-widest hover:bg-wedding-accent hover:text-white transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 relative z-30 cursor-pointer">
-                        UNLOCK
+                        ENTER
                     </button>
                     <p id="error-msg" class="text-red-400 text-xs mt-4 hidden opacity-0 transition-opacity">パスコードが正しくありません</p>
                 </div>
