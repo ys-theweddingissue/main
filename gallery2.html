@@ -84,7 +84,7 @@
 
     <!-- Header Navigation -->
     <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#FAF8F5]/80 backdrop-blur-md transition-all duration-300">
-        <a href="javascript:history.back()" class="font-lato text-xl tracking-widest font-bold cursor-pointer hover:text-[#8C9A8E] transition-colors">
+        <a href="index.html" class="font-lato text-xl tracking-widest font-bold cursor-pointer hover:text-[#8C9A8E] transition-colors">
             Y & S
         </a>
         <button onclick="history.back()" class="p-2 focus:outline-none hover:scale-110 transition-transform flex items-center gap-2">
@@ -94,28 +94,36 @@
     </header>
     
     <!-- Hero Section -->
-    <header class="min-h-[100svh] flex flex-col items-center justify-center px-6 md:px-20">
-    
-        <div class="relative w-full max-w-6xl aspect-[14/9] md:aspect-[21/9] overflow-hidden reveal">
+    <header class="pt-20 items-center justify-center md:px-20">
+        <div class="relative w-full aspect-[16/6] overflow-hidden reveal">
             <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/guest_gallery_00.jpg" 
-                alt="Biography Hero" 
-                class="w-full h-full object-cover brightness-75 opacity-50">
+                class="w-full h-full object-cover object-center brightness-75 opacity-30">
             
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
-                <h1 class="font-lato text-3xl md:text-7xl font-light tracking-[0.25em] drop-shadow-sm">
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-Black">
+                <h1 class="font-lato text-4xl md:text-7xl font-light tracking-[0.25em] drop-shadow-sm">
                     GALLERY
                 </h1>
             </div>
         </div>
 
+        <div class="max-w-4xl pt-5 mx-auto text-center fade-up">
+            <p class="text-sm leading-loose opacity-70 max-w-xl mx-auto px-4">
+                本日お越し頂いた皆様との思い出を<br>
+                ほんの少しだけ紹介いたします。
+            </p>
+        </div>
+
         <!-- ↓余白をスマホで圧縮 -->
-        <div class="mt-12 md:mt-40 reveal">
+        <div class="mt-12 mb-12 md:mt-40 flex flex-col items-center justify-center reveal">
             <div class="animate-bounce text-[#8C9A8E]">
                 <i data-lucide="chevron-down" class="w-6 h-6 opacity-50"></i>
             </div>
         </div>
 
     </header>
+
+
+
 
 
     <!-- Magazine Grid Layout -->
