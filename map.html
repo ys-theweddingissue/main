@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIBUYA MAP</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* ブランドカラー定義 */
+        :root {
+            --color-bg: #FAF8F5;    /* 背景色（生成り） */
+            --color-text: #4A4238;  /* ダークブラウン */
+            --color-accent: #8C9A8E;/* セージグリーン */
+            --color-border: #D3CBB8;/* ボーダー色 */
+        }
+
+        body {
+            font-family: 'Lato', 'Noto Sans JP', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            scroll-behavior: smooth;
+        }
+
+        /* アニメーション演出 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .fade-up.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ハイライトアニメーション */
+        @keyframes highlight-flash {
+            0% { 
+                background-color: #fff;
+                border-color: #EEEAE5;
+                transform: scale(1);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            }
+            20% { 
+                background-color: #F0F4F1;
+                border-color: var(--color-accent);
+                transform: scale(1.03);
+                box-shadow: 0 10px 25px rgba(140, 154, 142, 0.2);
+            }
+            100% { 
+                background-color: #fff;
+                border-color: #EEEAE5;
+                transform: scale(1);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            }
+        }
+
+        .active-highlight {
+            animation: highlight-flash 1.5s ease-out forwards;
+            z-index: 10;
+        }
+
+        /* ショップカードのデザイン */
+        .shop-card {
+            scroll-margin-top: 120px;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: stretch;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            overflow: hidden;
+            min-height: 110px;
+        }
+
+        .text-sage { color: var(--color-accent); }
+
+        /* 地図プレビュー */
+        .map-preview-container {
+            flex: 0 0 32%;
+            min-width: 90px;
+            max-width: 300px;
+            background-color: #E5E2DD;
+            border-left: 1px solid #EEEAE5;
+            position: relative;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .map-iframe-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400%;
+            height: 400%;
+            transform: translate(-50%, -50%) scale(0.25);
+            transform-origin: center;
+        }
+
+        @media (min-width: 640px) {
+            .map-preview-container { flex: 0 0 220px; pointer-events: auto; }
+            .map-iframe-wrapper { width: 100%; height: 100%; transform: none; top: 0; left: 0; }
+        }
+
+        .map-iframe-wrapper iframe { width: 100%; height: 100%; border: 0; }
+
+        .info-container { flex: 1; min-width: 0; }
+
+        @media (max-width: 480px) {
+            .info-container { padding: 12px !important; }
+            .shop-title { font-size: 0.8rem !important; margin-bottom: 2px !important; }
+            .shop-desc { font-size: 0.6rem !important; color: #777; line-height: 1.3 !important; }
+            .shop-meta { font-size: 0.6rem !important; padding-top: 4px !important; margin-top: 4px !important; }
+        }
+
+        /* リーフレットポップアップのカスタマイズ */
+        .leaflet-popup-content-wrapper {
+            background: rgba(140, 154, 142, 0.9); /* セージグリーン透過 */
+            color: #fff;
+            border-radius: 20px;
+            padding: 2px 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
+            text-align: center; /* コンテンツ全体を中央揃えに強制 */
+        }
+        .leaflet-popup-content {
+            margin: 8px 12px;
+            font-family: 'Lato', 'Noto Sans JP', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center; /* 複数行になった場合も中央揃え */
+            min-width: 60px; /* 極端に短い店名でも形を保つ */
+        }
+        .leaflet-popup-tip-container {
+            display: none; /* 三角のしっぽを消す */
+        }
+        .leaflet-popup-close-button {
+            display: none !important; /* ×ボタンを消してミニマルに */
+        }
+
+        /* 会場（TRUNK）アイコン */
+        .venue-combined-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            white-space: nowrap;
+        }
+        .venue-icon-svg {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #000;
+        }
+        .venue-pulse {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            position: absolute;
+            animation: pulse-animation 2.5s infinite ease-out;
+            z-index: 1;
+        }
+        @keyframes pulse-animation {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        .venue-label-text {
+            font-family: 'Lato', 'Noto Sans JP', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: #000;
+            margin-left: 10px;
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        .shop-pin-icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pin-svg-icon {
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#FAF8F5]/80 backdrop-blur-md transition-all duration-300">
+        <!-- ロゴ部分をindex.htmlへのリンクに変更 -->
+        <a href="index.html" class="font-lato text-xl tracking-widest font-bold cursor-pointer hover:text-[#8C9A8E] transition-colors">
+            Y & S
+        </a>
+        <button onclick="history.back()" class="p-2 focus:outline-none hover:scale-110 transition-transform flex items-center gap-2">
+            <span class="text-[10px] tracking-widest opacity-60">CLOSE</span>
+            <i data-lucide="x" class="w-5 h-5 text-wedding-text"></i>
+        </button>
+        
+    </header>
+
+    <header class="pt-16 items-center justify-center md:px-20">
+    
+        <div class="relative w-full aspect-[16/6] overflow-hidden reveal">
+            <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/ABOUTUS_00.jpg" 
+                class="w-full h-full object-cover object-center brightness-75 opacity-30">
+            
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-Black">
+                <h1 class="font-lato text-3xl md:text-7xl font-light tracking-[0.25em] drop-shadow-sm">
+                    AFTER PARTY
+                </h1>
+            </div>
+        </div>
+
+        <div class="max-w-4xl pt-5 mx-auto text-center fade-up">
+            <p class="text-sm leading-loose opacity-70 max-w-xl mx-auto px-4">
+                限られたお時間ではございますが、<br>
+                宴会が閉じた後も、<br>
+                皆様におきましても、<br>
+                久しぶりの再会をゆっくりと<br>
+                お楽しみいただければと思います。
+            </p>
+        </div>
+
+        <!-- ↓余白をスマホで圧縮 -->
+        <div class="mt-12 mb-12 md:mt-40 flex flex-col items-center justify-center reveal">
+            <div class="animate-bounce text-[#8C9A8E]">
+                <i data-lucide="chevron-down" class="w-6 h-6 opacity-50"></i>
+            </div>
+        </div>
+
+    </header>
+
+
+    <section id="map" class="py-16 bg-[#F8F6F2]">
+        <div class="max-w-4xl mx-auto px-6 text-center fade-up mb-12">
+            <h2 class="text-xl md:text-2xl font-light tracking-[0.2em] uppercase mb-4">SHIBUYA MAP</h2>
+            <p class="text-xs opacity-60">
+                アイコンをタップすると店名が表示されます
+            </p>
+        </div>
+        <div class="max-w-4xl mx-auto px-6 fade-up">
+            <div id="shop-map" class="h-[400px] md:h-[550px] w-full shadow-sm border border-white p-2 bg-white rounded-2xl"></div>
+        </div>
+    </section>
+
+    <section id="list" class="py-20 px-4 max-w-4xl mx-auto">
+        <div id="shop-grid" class="flex flex-col gap-4 md:gap-6"></div>
+    </section>
+
+    <section class="reveal pt-20 pb-20 border-t border-[#D3CBB8]/30 text-center">
+        <button onclick="history.back()" class="group inline-flex flex-col items-center gap-4 transition-all hover:scale-105">
+            <div class="w-10 h-10 rounded-full border border-[#4A4238]/20 flex items-center justify-center group-hover:bg-[#4A4238] group-hover:text-white transition-all">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            </div>
+            <span class="block text-[9px] tracking-[0.4em] text-[#4A4238]/40 uppercase font-bold">Back to Page</span>
+        </button>
+    </section>
+
+    <footer class="bg-white py-16 text-center border-t border-wedding-border/20 relative z-10">
+        <h2 class="font-lato text-2xl tracking-[0.3em] mb-4 font-light">YUSAKU & SAORI</h2>
+        <p class="font-lato text-xs tracking-[0.2em] text-wedding-text/40 mb-2">2026.9.12</p>
+    </footer>
+
+    <script>
+        const shopData = [
+            {
+                id: "shop-01",
+                name: "渋谷っ子居酒屋 旨串とりとん",
+                category: "Izakaya",
+                description: "宮下公園の目の前にある活気あふれる居酒屋。個室も完備しており、大人数での2次会にも柔軟に対応可能です。",
+                tel: "03-5468-2941",
+                hours: "17:00 - 23:30",
+                tags: ["大人数", "個室", "喫煙可"],
+                coords: [35.66120251457132, 139.702076773367],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3241.6919617153444!2d139.69911160808707!3d35.65996030075594!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca7e88dec69%3A0xf5585255d19ff3f8!2z5riL6LC344Gj5a2Q5bGF6YWS5bGLIOaXqOS4suOBqOOCiuOBqOOCkw!5e0!3m2!1sja!2sjp!4v1776063770751!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13220281/"
+            },
+            {
+                id: "shop-02",
+                name: "酒場 つむぎ堂 渋谷店",
+                category: "Izakaya",
+                description: "奥渋エリアに位置する洗練されたモダン酒場。加熱式タバコ限定で喫煙が可能で、質の高い創作和食とお洒落な空間が、2次会をワンランク上に演出します。",
+                tel: "03-6407-1388",
+                hours: "17:00 - 23:30",
+                tags: ["お洒落", "喫煙可", "個室"],
+                coords: [35.66207292402337, 139.6956006062343],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1362.9270698003838!2d139.69495427269763!3d35.66209900808164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188d0ed08befe9%3A0x6985ed623b4ec8b9!2z6YWS5aC0IOOBpOOCgOOBjuWggiDmuIvosLflupc!5e0!3m2!1sja!2sjp!4v1776064147524!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13312438/"
+            },
+            {
+                id: "shop-03",
+                name: "KICHIRI 渋谷",
+                category: "Izakaya",
+                description: "モダンで高級感のある内装が特徴の和食ダイニング。完全個室が多く、結婚式の2次会などフォーマルな格好でも安心して利用できる安定したホスピタリティが魅力です。",
+                tel: "03-4540-6248",
+                hours: "17:00 - 23:00",
+                tags: ["個室", "静か", "人気店"],
+                coords: [35.65988555093934, 139.69931594502316],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7710.086718402639!2d139.6938858389119!3d35.65995587454872!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca831b50907%3A0x8230b0ddb6f6a506!2zS0lDSElSSSDmuIvosLc!5e0!3m2!1sja!2sjp!4v1776064203333!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13057951/"
+            },
+            {
+                id: "shop-04",
+                name: "宮益坂のごりょさん",
+                category: "Izakaya",
+                description: "博多の野菜巻き串が楽しめる常に賑わう人気店。宮益坂側の落ち着いたエリアにあり、活気がありながらも清潔感のある空間が魅力です。",
+                tel: "03-6433-5191",
+                hours: "17:00 - 23:30",
+                tags: ["喫煙可", "人気店", "和風"],
+                coords: [35.6608725749054, 139.70571338180795],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.621171472709!2d139.695412274997!3d35.660863561498836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b58b9915555%3A0xd7eb5bb59077829b!2z5a6u55uK5Z2C44Gu44GU44KK44KH44KT44GV44KT!5e0!3m2!1sja!2sjp!4v1776064230594!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13194761/"
+            },
+            {
+                id: "shop-05",
+                name: "ウダガワ 成ル",
+                category: "Izakaya",
+                description: "お洒落な鉄板料理が楽しめる、渋谷の喧騒を離れた大人の隠れ家。丁寧に焼き上げられた料理を囲みながら、センスの良い空間で上質な時間を過ごせます。",
+                tel: "03-3461-1166",
+                hours: "17:00 - 23:00",
+                tags: ["お洒落", "個室", "人気店"],
+                coords: [35.66288701830739, 139.69720686602977],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.293695610018!2d139.68691137499812!3d35.662880161488395!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca94b5ed489%3A0xa2808bfe3574ea3f!2z44Km44OA44Ks44OvIOaIkOODqw!5e0!3m2!1sja!2sjp!4v1776064250986!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13161444/"
+            },
+            {
+                id: "shop-06",
+                name: "葱や平吉 渋谷宇田川町",
+                category: "Izakaya",
+                description: "古民家を改装した趣のある一軒家レストラン。葱料理が主役で、落ち着いた大人な雰囲気の中、ゆったりとした時間を過ごせる2次会向きの空間です。",
+                tel: "03-3780-3116",
+                hours: "17:30 - 22:30",
+                tags: ["静か", "大人数", "和風"],
+                coords: [35.661792644506974, 139.69658215186735],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.474876222455!2d139.68628547499753!3d35.66176446149418!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca95e84a385%3A0x7410e80487cfefe7!2z6JGx44KE5bmz5ZCJIOa4i-iwt-Wuh-eUsOW3neeUuuW6lw!5e0!3m2!1sja!2sjp!4v1776064276598!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13024073/"
+            },
+            {
+                id: "shop-07",
+                name: "ビストロミートマン",
+                category: "Bistro",
+                description: "お肉料理がメインの陽気なビストロ。カジュアルにお酒と肉を楽しめる雰囲気で、友人同士の賑やかな2次会に最適です。",
+                tel: "03-6434-1166",
+                hours: "17:00 - 23:30",
+                tags: ["喫煙可", "カジュアル", "人気店"],
+                coords: [35.660999168165624, 139.70604209811458],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.599379221048!2d139.69574157499716!3d35.66099776149814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188bc760bba89b%3A0x19f23f99dd6da4a7!2z44OT44K544OI44Ot44Of44O844OI44Oe44Oz!5e0!3m2!1sja!2sjp!4v1776064303201!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13229352/"
+            },
+            {
+                id: "shop-08",
+                name: "シブヤバル209",
+                category: "Bistro",
+                description: "道玄坂にあるスペインバルスタイルの人気店。開放的な雰囲気で、ワインとタパスを楽しみながらカジュアルに盛り上がることができます。",
+                tel: "03-3462-2090",
+                hours: "11:30 - 05:00",
+                tags: ["喫煙可", "人気店", "カジュアル"],
+                coords: [35.65925607749829, 139.69759362087117],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2292.236908137255!2d139.69581870812183!3d35.65945379135678!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca9c25931cb%3A0x6ce367d1739bc1d8!2z44K344OW44Ok44OQ44OrMjA5!5e0!3m2!1sja!2sjp!4v1776064322422!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13076153/"
+            },
+            {
+                id: "shop-09",
+                name: "東京ワイン倶楽部 楽",
+                category: "Bistro",
+                description: "渋谷駅近ながら、落ち着いた雰囲気でワインを楽しめるビストロ。料理の質が高く、大人な2次会を演出したい際におすすめの清潔感ある店舗です。",
+                tel: "03-3461-1250",
+                hours: "17:00 - 23:30",
+                tags: ["静か", "喫煙可", "駅近"],
+                coords: [35.65734391223875, 139.69771032658414],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12967.192697401098!2d139.68741267499524!3d35.65734386151705!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b56408ddc07%3A0x5bcac7d78f4ec076!2z5p2x5Lqs44Ov44Kk44Oz5YC25qW96YOoIOalvQ!5e0!3m2!1sja!2sjp!4v1776064352340!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13109931/"
+            },
+            {
+                id: "shop-10",
+                name: "渋谷 てやん亭゛",
+                category: "Izakaya",
+                description: "創作和食が楽しめる、大人の隠れ家的な雰囲気を持つ居酒屋。スタッフの活気が良く、料理の盛り付けも美しいためお祝いの席にも最適です。",
+                tel: "03-3462-6663",
+                hours: "17:00 - 23:30",
+                tags: ["喫煙可", "和風", "人気店"],
+                coords: [35.656528577971116, 139.70135397696666],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12967.324802122443!2d139.69104537499473!3d35.656530261521276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188bff17099605%3A0x6d825cae80a97564!2z5riL6LC3IOOBpuOChOOCk-S6reOCmw!5e0!3m2!1sja!2sjp!4v1776064373326!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13019206/"
+            },
+            {
+                id: "shop-11",
+                name: "汁べゑ 渋谷店",
+                category: "Izakaya",
+                description: "新郎バイト先の姉妹店。ドラマチックな入り口と活気あるオープンキッチンがゲストを楽しませてくれます。",
+                tel: "03-3463-1010",
+                hours: "17:30 - 23:30",
+                tags: ["喫煙可", "人気店", "隠れ家"],
+                coords: [35.66254610357086, 139.70108884574626],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.349217913796!2d139.69078957499792!3d35.66253826149018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b5677f84601%3A0xbe608c71e6cde5ee!2z5rGB44G544KRIOa4i-iwt-W6lw!5e0!3m2!1sja!2sjp!4v1776064403534!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13007275/"
+            },
+            {
+                id: "shop-12",
+                name: "ゑすじ郎 / SG Low",
+                category: "Izakaya",
+                description: "宮下公園すぐ近くのGEMS神宮前内にある鉄板焼き居酒屋。スタイリッシュな店内で喫煙も可能。大人数での利用もしやすく、2次会にも適した清潔感があります。",
+                tel: "03-6427-1560",
+                hours: "17:00 - 24:00",
+                tags: ["駅近", "喫煙可", "お洒落"],
+                coords: [35.66401961759304, 139.70142757872424],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.349217913796!2d139.69078957499792!3d35.66253826149018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188dfabc666acf%3A0xa6fa0177cd04a581!2z44KR44GZ44GY6YOOIC8gU0cgTG93!5e0!3m2!1sja!2sjp!4v1776064424758!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13255755/"
+            },
+            {
+                id: "shop-13",
+                name: "カクニマル",
+                category: "Izakaya",
+                description: "名物の角煮をはじめとする創作和食が人気の居酒屋。アットホームな雰囲気で、スタッフの丁寧なサービスがお祝いの席を温かくします。",
+                tel: "03-6416-5211",
+                hours: "17:00 - 24:00",
+                tags: ["和風", "喫煙可", "お洒落"],
+                coords: [35.65672413157852, 139.69605774495733],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12967.293562254772!2d139.6857587749948!3d35.6567226615203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b55de3df909%3A0xa7154d3432977cc4!2z44Kr44Kv44OL44Oe44Or!5e0!3m2!1sja!2sjp!4v1776064473751!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13218029/"
+            },
+            {
+                id: "shop-14",
+                name: "BISTRO DE まいど",
+                category: "Bistro",
+                description: "宮益坂付近に位置する、どこか懐かしい雰囲気のビストロ。手作りの温かい料理とワインを、肩肘張らずにカジュアルに楽しめます。",
+                tel: "050-5570-6659",
+                hours: "17:30 - 23:30",
+                tags: ["喫煙可", "隠れ家", "カジュアル"],
+                coords: [35.660710435763804, 139.70484951882474],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.64624384116!2d139.69454747499697!3d35.66070916149963!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b5890efc2e7%3A0xc59923672bb8c9ee!2z5bGF6YWS5bGLIEJJU1RSTyBERSDjgb7jgYTjgakg77yI44OT44K544OI44Ot44O744OH44O744Oe44Kk44OJ77yJ5riL6LC3!5e0!3m2!1sja!2sjp!4v1776064492506!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13013705/"
+            },
+            {
+                id: "shop-15",
+                name: "今も昔や",
+                category: "Izakaya",
+                description: "創業から続く安定感のある和風居酒屋。個室も完備しており、親しい友人たちとゆっくりお酒を酌み交わしたいシーンに最適です。",
+                tel: "050-5872-7431",
+                hours: "17:30 - 24:00",
+                tags: ["個室", "和風", "喫煙可"],
+                coords: [35.66011096334215, 139.7031288108023],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.743479571081!2d139.69282877499666!3d35.66011036150273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b586fce186d%3A0x77916de19fd7562a!2z5LuK44KC5piU44KE!5e0!3m2!1sja!2sjp!4v1776064516977!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13004733/"
+            },
+            {
+                id: "shop-16",
+                name: "ごんべえ 渋谷",
+                category: "Izakaya",
+                description: "一流の料理人が美味しい和食を居酒屋として提供するお店。広いお席があります。",
+                tel: "050-5590-1452",
+                hours: "17:00 - 23:00",
+                tags: ["大人数", "個室", "加熱式"],
+                coords: [35.66134390687984, 139.69783827561164],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7277.259473425339!2d139.69341687363976!3d35.66098104148225!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca90d92ddd7%3A0xeac419ac076f3b0d!2z44GU44KT44G544GI!5e0!3m2!1sja!2sjp!4v1776064768948!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13199698/"
+            },
+            {
+                id: "shop-17",
+                name: "八月の鯨",
+                category: "Bar",
+                description: "センター街の地下に佇むバー。好きな映画のイメージに沿ったカクテルを作ってくれます。映画好き必見です。",
+                tel: "03-3476-7238",
+                hours: "18:00 - 04:00",
+                tags: ["静か", "お洒落", "加熱式"],
+                coords: [35.66052462712738, 139.69817811290332],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12966.676149643012!2d139.68786527338827!3d35.6605249956198!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188ca9a55c462f%3A0xc1242a2235dc666b!2z5YWr5pyI44Gu6a-o!5e0!3m2!1sja!2sjp!4v1776064596719!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13001917/"
+            },
+            {
+                id: "shop-18",
+                name: "カラオケまねきねこ 渋谷本店",
+                category: "Bar",
+                description: "本日の最終目的地「ラフテル」。 さぁ元気だしてこーか。まず声だしてこーよ。いろいろあるけどなんとかなる。",
+                tel: "03-6452-5704",
+                hours: "24時間営業",
+                tags: ["カラオケ"],
+                coords: [35.6595124267383, 139.69828056440406],
+                mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1620.8633904400479!2d139.69739740254485!3d35.6591025847202!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188d3e6e4ba6cb%3A0x82e94eb5aae189d6!2z44Kr44Op44Kq44Kx44G-44Gt44GN44Gt44GTIOa4i-iwt-acrOW6lw!5e0!3m2!1sja!2sjp!4v1776064712264!5m2!1sja!2sjp",
+                officialMap: "https://tabelog.com/tokyo/A1303/A130301/13253873/"
+            }
+        ];
+
+        let leafletMap;
+
+        function scrollToShop(shopId) {
+            const target = document.getElementById(shopId);
+            if (!target) return;
+
+            // ポップアップを閉じる
+            if (leafletMap) leafletMap.closePopup();
+
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            target.classList.remove('active-highlight');
+            void target.offsetWidth;
+            target.classList.add('active-highlight');
+
+            setTimeout(() => {
+                target.classList.remove('active-highlight');
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('shop-grid');
+            
+            shopData.forEach(shop => {
+                const card = document.createElement('div');
+                card.id = shop.id;
+                card.className = "shop-card bg-white rounded-xl border border-[#EEEAE5] fade-up shadow-sm";
+                
+                const tagsHtml = shop.tags.map(tag => `
+                    <span class="text-[8px] border border-[#EEEAE5] px-1.5 py-0.5 rounded text-[#4A4238] text-opacity-60 whitespace-nowrap">${tag}</span>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="info-container p-4 md:p-6 flex flex-col justify-between">
+                        <div>
+                            <span class="text-[8px] tracking-[0.2em] text-sage font-bold uppercase mb-0.5 block">${shop.category}</span>
+                            <h3 class="shop-title text-sm md:text-base font-bold text-[#4A4238] truncate mb-1">${shop.name}</h3>
+                            <p class="shop-desc text-[10px] md:text-xs opacity-70 line-clamp-2">${shop.description}</p>
+                        </div>
+                        <div class="shop-meta border-t border-[#F3F0EC] pt-2 mt-2 flex items-center justify-between">
+                            <div class="flex flex-wrap gap-1">${tagsHtml}</div>
+                            <a href="${shop.officialMap}" target="_blank" class="inline-flex items-center text-[9px] font-bold text-sage uppercase tracking-wider">
+                                web site <i data-lucide="external-link" class="w-2 h-2 ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="map-preview-container">
+                        <div class="map-iframe-wrapper">
+                            <iframe src="${shop.mapUrl}" class="grayscale-[1]" loading="lazy"></iframe>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('show');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+            // 地図初期化
+            leafletMap = L.map('shop-map', { scrollWheelZoom: false });
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(leafletMap);
+
+            const venueCoords = [35.664347107170556, 139.70399109513858];
+            const venueIcon = L.divIcon({
+                className: 'venue-combined-custom',
+                html: `
+                    <div class="venue-combined-wrapper">
+                        <div class="venue-icon-svg">
+                            <div class="venue-pulse"></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+                            </svg>
+                        </div>
+                        <div class="venue-label-text">TRUNK</div>
+                    </div>
+                `,
+                iconSize: [120, 24], iconAnchor: [10, 12] 
+            });
+            L.marker(venueCoords, { icon: venueIcon, interactive: false, zIndexOffset: 10000 }).addTo(leafletMap);
+
+            const shopPinIcon = L.divIcon({
+                className: 'shop-pin-icon-wrapper',
+                html: `
+                    <svg class="pin-svg-icon" width="28" height="34" viewBox="0 0 28 34" fill="none">
+                        <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 20 14 20s14-9.5 14-20c0-7.732-6.268-14-14-14z" fill="#8C9A8E"/>
+                        <circle cx="14" cy="14" r="5" fill="white"/>
+                    </svg>
+                `,
+                iconSize: [18, 25], iconAnchor: [14, 34], popupAnchor: [0, -32]
+            });
+
+            const bounds = L.latLngBounds();
+            bounds.extend(venueCoords);
+
+            shopData.forEach(shop => {
+                const marker = L.marker(shop.coords, { icon: shopPinIcon }).addTo(leafletMap);
+                
+                // チップデザインのポップアップ
+                const popupContent = `<div onclick="scrollToShop('${shop.id}')" style="cursor:pointer; width: 100%; text-align: center;">${shop.name}</div>`;
+                marker.bindPopup(popupContent, {
+                    maxWidth: 200,
+                    className: 'custom-tip-popup'
+                });
+                
+                bounds.extend(shop.coords);
+            });
+
+            leafletMap.fitBounds(bounds, { padding: [50, 50] });
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

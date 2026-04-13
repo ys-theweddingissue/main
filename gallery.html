@@ -78,50 +78,112 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--color-bg); }
         ::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 10px; }
+
+        /* --- OUR STORY リデザイン用追加CSS --- */
+        #our-story {
+            position: relative;
+            padding-top: 4rem;
+        }
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+        }
+        .story-magazine-text {
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            line-height: 2.2;
+            color: var(--color-text);
+            opacity: 0.85;
+        }
+        .story-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            border-bottom: 1px solid var(--color-border);
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .story-caption {
+            font-size: 9px;
+            letter-spacing: 0.1em;
+            opacity: 0.5;
+            margin-top: 0.75rem;
+        }
+        @media (min-width: 768px) {
+            .story-magazine-text {
+                font-size: 12px;
+            }
+        }
+
+        /* 写真の位置指定用 */
+        /* White Card for Text (Left Top) */
+        .text-card {
+            background: white;
+            padding: 4vw;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+            grid-column: 1 / span 7; 
+            grid-row: 1;
+            z-index: 10;
+            position: relative;
+        }
+        /* Photo 1: Left Bottom */
+        .photo-left-bottom {
+            grid-column: 1 / span 7;
+            grid-row: 2;
+            margin-top: 2vw;
+            z-index: 5;
+        }
+        /* Photo 2: Right Side */
+        .photo-right {
+            grid-column: 8 / span 5;
+            grid-row: 1 / span 2;
+            margin-top: 5vh;
+            z-index: 5;
+        }
+
+
     </style>
 </head>
 <body class="antialiased">
 
     <header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#FAF8F5]/80 backdrop-blur-md transition-all duration-300">
-        <a href="javascript:history.back()" class="font-lato text-xl tracking-widest font-bold cursor-pointer hover:text-[#8C9A8E] transition-colors">
+        <!-- ロゴ部分をindex.htmlへのリンクに変更 -->
+        <a href="index.html" class="font-lato text-xl tracking-widest font-bold cursor-pointer hover:text-[#8C9A8E] transition-colors">
             Y & S
         </a>
         <button onclick="history.back()" class="p-2 focus:outline-none hover:scale-110 transition-transform flex items-center gap-2">
             <span class="text-[10px] tracking-widest opacity-60">CLOSE</span>
             <i data-lucide="x" class="w-5 h-5 text-wedding-text"></i>
         </button>
+        
     </header>
 
-    <!-- <header class="h-screen flex flex-col items-center justify-center px-6 md:px-20">
-        <div class="relative w-full max-w-6xl aspect-[14/7] md:aspect-[21/9] overflow-hidden reveal">
-            <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/ABOUTUS_00.jpg" alt="Biography Hero" class="w-full h-full object-cover brightness-75 opacity-50">
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
-                <h1 class="font-lato text-4xl md:text-7xl font-light tracking-[0.25em] drop-shadow-sm">ABOUT US</h1>
-            </div>
-        </div>
-        <div class="mt-40 reveal">
-            <div class="animate-bounce text-[#8C9A8E]">
-                <i data-lucide="chevron-down" class="w-6 h-6 opacity-50"></i>
-            </div>
-        </div>
-    </header> -->
-
-    <header class="min-h-[100svh] flex flex-col items-center justify-center px-6 md:px-20">
+    <header class="pt-16 items-center justify-center md:px-20">
     
-        <div class="relative w-full max-w-6xl aspect-[14/9] md:aspect-[21/9] overflow-hidden reveal">
+        <div class="relative w-full aspect-[16/6] overflow-hidden reveal">
             <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/ABOUTUS_00.jpg" 
-                alt="Biography Hero" 
-                class="w-full h-full object-cover brightness-75 opacity-50">
+                class="w-full h-full object-cover object-center brightness-75 opacity-30">
             
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-Black">
                 <h1 class="font-lato text-3xl md:text-7xl font-light tracking-[0.25em] drop-shadow-sm">
                     ABOUT US
                 </h1>
             </div>
         </div>
 
+        <div class="max-w-4xl pt-5 mx-auto text-center fade-up">
+            <p class="text-sm leading-loose opacity-70 max-w-xl mx-auto px-4">
+                私たちのルーツを<br>
+                ほんの少しだけ紹介いたします。
+            </p>
+        </div>
+
         <!-- ↓余白をスマホで圧縮 -->
-        <div class="mt-12 md:mt-40 reveal">
+        <div class="mt-12 mb-12 md:mt-40 flex flex-col items-center justify-center reveal">
             <div class="animate-bounce text-[#8C9A8E]">
                 <i data-lucide="chevron-down" class="w-6 h-6 opacity-50"></i>
             </div>
@@ -232,43 +294,144 @@
         </section>
 
 
-        <!-- <二人の物語> -->
-
-        <section class="relative max-w-5xl mx-auto">
-            <div class="text-center mt-40 mb-16 reveal">
-                <span class="font-loto text-sm tracking-[0.4em] opacity-40 uppercase">2018-2026</span>
-                <h2 class="font-loto text-4xl mt-2 font-light tracking-[0.25em]">OUR HISTORY</h2>
+        <!-- <二人の物語> : リデザイン対象 -->
+        <section id="our-story" class="relative max-w-5xl mx-auto">
+            <div class="text-center mb-24 reveal">
+                <span class="font-lato text-sm tracking-[0.6em] opacity-40 uppercase border-b border-color-border pb-2">2018-2026</span>
+                <h2 class="font-lato text-4xl mt-6 font-light tracking-[0.3em]">OUR HISTORY</h2>
             </div>
-            <!-- <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 reveal"> -->
-            <div class="grid grid-cols-2 gap-4 md:gap-8 reveal">
-                <div class="col-span-2 md:col-span-2 img-container aspect-[16/9] shadow-xl">
-                    <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_01.jpg">
+
+            <!-- Block 1: Beginning of US -->
+            <div class="story-grid mb-24 md:mb-40 reveal">
+                <div class="col-span-12 relative">
+                <!-- <div class="col-span-12 md:col-span-7 relative"> -->
+                    <div class="img-container aspect-[16/12] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_010.jpg" alt="First Memory">
+                    </div>
+                    <div class="absolute -bottom-6 -right-4 md:-right-8 bg-white p-4 md:p-6 border border-color-border/30 shadow-lg max-w-[200px] md:max-w-xs">
+                        <span class="story-label">Episode 01</span>
+                        <p class="story-magazine-text">
+                            偶然の出会いが、<br>
+                            必然の運命に変わるまで。<br>
+                            同じ景色を見て歩む<br>
+                            新しい旅の始まり。
+                        </p>
+                    </div>
                 </div>
-                <div class="col-span-1 md:col-span-1 flex flex-col justify-center bg-white p-8 border border-[#D3CBB8]/30">
-                    <p class="text-[11px] leading-loose opacity-70">
-                        偶然の出会いが、<br>
-                        必然の運命に変わるまで。<br>
-                        同じ景色を見て歩む<br>
-                        新しい旅の始まり。
-                    </p>
-                </div>
-                <div class="col-span-1 img-container aspect-[3/4]"><img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_02.jpg"></div>
-                <div class="col-span-2 img-container aspect-[16/9] md:aspect-auto"><img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_03.jpg"></div>                
-
-
-                <div class="col-span-1 md:col-span-1 flex flex-col justify-center bg-white p-8 border border-[#D3CBB8]/30">
-                    <p class="text-[11px] leading-loose opacity-70">
-                        紡がれてきた<br>
-                        たくさんの思い出<br>
-                        出会い、笑い合い、同じ時間を重ねるうちに<br>
-                        二人の物語になりました
-                    </p>
-                </div>
-                <div class="col-span-1 img-container aspect-[3/4]"><img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_05.jpg"></div>
-                <div class="col-span-2 img-container aspect-[16/9] md:aspect-auto"><img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_06.jpg"></div>                
-
-
             </div>
+            
+
+            <!-- Block 2: Memories -->
+            <div class="story-grid mb-24 md:mb-40 items-center reveal">
+                <!-- Text Card (Left Top) -->
+                <div class="absolute shadow-lg z-10 top-3 left-5 md:-right-8 bg-white p-4 md:p-6 border border-color-border/30 max-w-[200px] md:max-w-xs">
+                        <span class="story-label">Episode 01</span>
+                        <p class="story-magazine-text">
+                            偶然の出会いが、<br>
+                            必然の運命に変わるまで。
+                        </p>
+                </div>
+                <!-- Photo 1 (Left Bottom) -->
+                <div class="photo-left-bottom reveal" style="transition-delay: 0.2s;">
+                    <div class="img-container aspect-[5/4] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_020.jpg" alt="Memory Photo 1">
+                    </div>
+                </div>
+                <!-- Photo 2 (Right Side) -->
+                <div class="photo-right reveal" style="transition-delay: 0.4s;">
+                    <div class="img-container aspect-[4/5] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_030.jpg" alt="Memory Photo 2">
+                    </div>
+                    <p class="story-caption">Autumn Walk, 2021</p>
+                </div>
+            </div>
+
+            <!-- Block 3: Beginning of US -->
+            <div class="story-grid mb-24 md:mb-40 reveal">
+                <div class="col-span-12 relative">
+                <!-- <div class="col-span-12 md:col-span-7 relative"> -->
+                    <div class="img-container aspect-[12/6] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_010.jpg" alt="First Memory">
+                    </div>
+                    <div class="absolute -top-6 -right-4 md:-right-8 bg-white p-4 md:p-6 border border-color-border/30 shadow-lg max-w-[200px] md:max-w-xs">
+                        <span class="story-label">Episode 03</span>
+                        <p class="story-magazine-text">
+                            偶然の出会いが、<br>
+                            必然の運命に変わるまで。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Block 4: Memories -->
+            <div class="story-grid mb-24 md:mb-40 items-center reveal">
+                <!-- Text Card (Left Top) -->
+                <div class="absolute shadow-lg z-10 top-3 left-5 md:-right-8 bg-white p-4 md:p-6 border border-color-border/30 max-w-[200px] md:max-w-xs">
+                        <span class="story-label">Episode 04</span>
+                        <p class="story-magazine-text">
+                            偶然の出会いが、<br>
+                            必然の運命に変わるまで。
+                        </p>
+                </div>
+                <!-- Photo 1 (Left Bottom) -->
+                <div class="photo-left-bottom reveal" style="transition-delay: 0.2s;">
+                    <div class="img-container aspect-[5/4] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_020.jpg" alt="Memory Photo 1">
+                    </div>
+                </div>
+                <!-- Photo 2 (Right Side) -->
+                <div class="photo-right reveal" style="transition-delay: 0.4s;">
+                    <div class="img-container aspect-[4/5] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_030.jpg" alt="Memory Photo 2">
+                    </div>
+                    <p class="story-caption">Autumn Walk, 2021</p>
+                </div>
+            </div>
+
+            <!-- Block 5: Beginning of US -->
+            <div class="story-grid mb-24 md:mb-40 reveal">
+                <div class="col-span-12 relative">
+                <!-- <div class="col-span-12 md:col-span-7 relative"> -->
+                    <div class="img-container aspect-[16/12] shadow-lg">
+                        <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_010.jpg" alt="First Memory">
+                    </div>
+                    <div class="absolute -bottom-6 -right-4 md:-right-8 bg-white p-4 md:p-6 border border-color-border/30 shadow-lg max-w-[200px] md:max-w-xs">
+                        <span class="story-label">Episode 05</span>
+                        <p class="story-magazine-text">
+                            偶然の出会いが、<br>
+                            必然の運命に変わるまで。<br>
+                            同じ景色を見て歩む<br>
+                            新しい旅の始まり。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Block 6: The Bond -->
+            <div class="story-grid mb-24 reveal">
+                <div class="col-span-12 md:col-span-7 md:pl-12 flex flex-col justify-end">
+                    <div class="border-l-2 border-color-accent pl-6 py-4">
+                        <p class="story-magazine-text italic mb-6">
+                            "Finding you was like finding <br>
+                            the missing piece of my soul."
+                        </p>
+                        <p class="story-magazine-text">
+                            何気ない日常の積み重ねが、<br>
+                            かけがえのない絆を育んでいきました。<br>
+                            互いを支え合い、認め合う日々。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="story-grid grid grid-cols-2 gap-4 reveal">
+                <div class="img-container aspect-[16/12] shadow-lg"><img src="https://res.cloudinary.com/dmfyysmqy/image/upload/childhood_020.jpg"></div>
+                <div class="img-container aspect-[16/12] shadow-lg"><img src="https://res.cloudinary.com/dmfyysmqy/image/upload/childhood_030.jpg"></div>
+            </div>
+
         </section>
 
         <section class="text-center space-y-12">
@@ -278,7 +441,7 @@
 
             <div class="max-w-4xl mx-auto reveal">
                 <div class="img-container aspect-[21/9] shadow-inner grayscale-[0.2]">
-                    <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_07.jpg">
+                    <img src="https://res.cloudinary.com/dmfyysmqy/image/upload/relationship_070.jpg">
                 </div>
             </div>
             <div class="reveal max-w-lg mx-auto">

@@ -136,7 +136,7 @@
         }
 
       
-
+        /* 旧ボタン */
         .link-btn{
         position: relative;
         overflow: hidden;
@@ -169,9 +169,6 @@
         }
         }
 
-
-
-
         .link-btn{
           display:inline-block;
           padding:12px 24px;
@@ -188,6 +185,27 @@
         .link-btn:hover{
           opacity:1;
         }
+
+        /* 渋谷ボタン */
+        .icon-button {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .icon-button:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* 鼓動のようなアニメーション（注意を引くため） */
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .pulse-effect {
+            animation: pulse-soft 2s infinite ease-in-out;
+        }
+
+
+
 
     </style>
     <script>
@@ -232,9 +250,10 @@
                 <a href="#home" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">HOME</a>
                 <a href="#prologue" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">PROLOGUE</a>
                 <a href="#profile" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">PROFILE</a>
-                <a href="#our-story" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">OUR STORY</a>
+                <a href="#our-story" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">STORY</a>
                 <a href="#seating-guide" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">GUEST</a>
                 <a href="#cuisine" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">CUISINE</a>
+                <a href="#shibuya map" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">AFTER</a>
                 <a href="#special-memories" class="menu-link hover:text-wedding-accent hover:scale-105 transition-all">SPECIALS</a>
             </nav>
             <div class="mt-10 pt-6 border-t border-wedding-border/30 text-xs tracking-[0.2em] text-wedding-text/50">
@@ -358,7 +377,7 @@
         <!-- 4. OUR STORY -->
         <section id="our-story" class="py-24 px-6 md:px-12 max-w-3xl mx-auto relative bg-[#FAF8F5]">
             <div class="text-center mb-12 fade-up">
-                <h2 class="font-lato text-4xl mb-2 font-light tracking-[0.25em]">OUR STORY</h2>
+                <h2 class="font-lato text-4xl mb-2 font-light tracking-[0.25em]">STORY</h2>
 
                 <span class="text-xs tracking-widest text-wedding-accent">ふたりの歩み</span>
                 <p class="text-xs mt-6 text-wedding-text/70">
@@ -422,7 +441,7 @@
                 </p>
 
                 <div class="container">
-                    <a href="gallery.html" class="link-btn mt-5 tracking-[0.5em] ">A LITTLE MORE ABOUT US</a>
+                    <a href="gallery.html" class="link-btn mt-5 tracking-[0.5em] ">MORE</a>
                 </div>
             </div>
 
@@ -563,9 +582,50 @@
             </div>
         </section>
 
-        <!-- 7. SPECIAL MEMORIES -->
+        <!-- 7. SHIBUYA MAP -->
+
+        <section id="shibuya map" class="py-24 overflow-hidden bg-white">
+            <div class="text-center mb-16 fade-up">
+                <h2 class="font-lato text-4xl mb-2 font-light tracking-[0.25em]">AFTER</h2>
+                <span class="text-xs tracking-widest text-wedding-accent">二次会のご提案</span>
+                <p class="text-xs mt-6 text-wedding-text/70">
+
+                    限られたお時間ではございますが、<br>
+                    ぜひ宴会が閉じた後も、<br>
+                    久しぶりの再会をゆっくりとお楽しみいただければと思います。<br>
+                    <br>
+                    私たちから二次会会場のご用意はしておりませんが、<br>
+                    皆さまが行き先に迷われることのないよう、<br>
+                    渋谷の名店をいくつかご紹介いたします。<br>
+                    <br>
+                    式が結び次第、<br>
+                    私たちも必ずどこかに顔を出しますので、<br>
+                    それぞれの場所で、思い思いに楽しい時間をお過ごしください。
+
+                </p>
+            </div>
+
+            <div class="text-center">
+                <!-- メインの画像ボタン -->
+                <div class="relative inline-block pulse-effect">
+                    <a href="map.html" class="icon-button block w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-8 border-white shadow-xl">
+                        <img 
+                            src="https://tse1.mm.bing.net/th/id/OIP.QuAfjBGEbj9oxM2tH5TSswAAAA?rs=1&pid=ImgDetMain&o=7&rm=3" 
+                            alt="Profile Photo" 
+                            class="w-full h-full object-cover"
+                            onerror="this.src='https://via.placeholder.com/400?text=Profile'"
+                        >
+                    </a>  
+                </div>
+                
+            </div>
+
+           
+        </section>
+
+        <!-- 8. SPECIAL MEMORIES -->
         <!-- <section id="our-story" class="py-24 px-6 md:px-12 max-w-3xl mx-auto relative bg-[#FAF8F5]"></section> -->
-        <section id="special-memories" class="py-24 px-6 bg-white text-wedding- relative overflow-hidden">
+        <section id="special-memories" class="py-24 px-6 text-wedding- relative overflow-hidden">
 
             <div class="max-w-md mx-auto text-center relative z-10">
                 <div class="mb-12 fade-up">
