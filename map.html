@@ -199,6 +199,12 @@
             filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
             transition: transform 0.2s ease;
         }
+
+        .venue-combined-custom {
+            background: transparent;
+            border: none;
+        }
+
     </style>
 </head>
 <body class="overflow-x-hidden">
@@ -249,7 +255,7 @@
         <div class="max-w-4xl mx-auto px-6 text-center fade-up mb-12">
             <h2 class="text-xl md:text-2xl font-light tracking-[0.2em] uppercase mb-4">SHIBUYA MAP</h2>
             <p class="text-xs opacity-60">
-                アイコンをタップすると店名が表示されます
+                アイコンおよび店名をタップすると店名が表示されます
             </p>
         </div>
         <div class="max-w-4xl mx-auto px-6 fade-up">
@@ -532,7 +538,7 @@
                         <div>
                             <span class="text-[8px] tracking-[0.2em] text-sage font-bold uppercase mb-0.5 block">${shop.category}</span>
                             <h3 class="shop-title text-sm md:text-base font-bold text-[#4A4238] truncate mb-1">${shop.name}</h3>
-                            <p class="shop-desc text-[10px] md:text-xs opacity-70 line-clamp-2">${shop.description}</p>
+                            <p class="shop-desc text-[10px] md:text-xs opacity-70 line-clamp-4">${shop.description}</p>
                         </div>
                         <div class="shop-meta border-t border-[#F3F0EC] pt-2 mt-2 flex items-center justify-between">
                             <div class="flex flex-wrap gap-1">${tagsHtml}</div>
@@ -582,7 +588,7 @@
                         <div class="venue-label-text">TRUNK</div>
                     </div>
                 `,
-                iconSize: [120, 24], iconAnchor: [10, 12] 
+                iconSize: [120, 24], iconAnchor: [10, 12] , className: 'venue-combined-custom'
             });
             L.marker(venueCoords, { icon: venueIcon, interactive: false, zIndexOffset: 10000 }).addTo(leafletMap);
 
